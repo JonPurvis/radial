@@ -3,6 +3,7 @@
     'label' => null,
     'value' => null,
     'hover' => null,
+    'hoverLabel' => null,
     'legend' => false,
     'tooltip' => true,
     'cutout' => 70,
@@ -48,6 +49,7 @@
     $showLegend = $legend !== false;
     $showLabel = filled($label);
     $hasHover = filled($hover);
+    $hasHoverLabel = filled($hoverLabel);
 
     $isHorizontalLegend = in_array($legendPosition, ['left', 'right']);
     $isVerticalLegend = in_array($legendPosition, ['top', 'bottom']);
@@ -73,15 +75,22 @@
         displayValue: @js($displayValue),
         label: @js($label ?? ''),
         hover: @js($hover ?? ''),
+        hoverLabel: @js($hoverLabel ?? ''),
         hasHover: @js($hasHover),
+        hasHoverLabel: @js($hasHoverLabel),
         segments: @js($segments),
 
         get currentValue() {
+            if (this.centerHovered && this.hasHover) {
+                return this.hover;
+            }
             return this.hovered !== null ? this.segments[this.hovered].value : this.displayValue;
         },
 
         get currentLabel() {
-            if (this.centerHovered && this.hasHover) return this.hover;
+            if (this.centerHovered && this.hasHoverLabel) {
+                return this.hoverLabel;
+            }
             return this.hovered !== null ? this.segments[this.hovered].label : this.label;
         },
 
@@ -201,7 +210,6 @@
                     cy="{{ $center }}"
                     r="{{ $innerRadius }}"
                     fill="transparent"
-                    class="{{ $hasHover ? 'cursor-pointer' : '' }}"
                     @mouseenter="handleCenterEnter()"
                     @mouseleave="handleCenterLeave()"
                 />
