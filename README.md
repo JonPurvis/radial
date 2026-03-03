@@ -1,15 +1,10 @@
 # Radial
 
-Beautiful donut charts for [Flux UI](https://fluxui.dev). Drop-in components with hover effects, legends, and dark mode support.
+Beautiful donut and pie charts for [Flux UI](https://fluxui.dev). Drop-in components with hover effects, legends, and dark mode support.
 
-![Radial screenshot](resources/img/screenshot.png)
-
-## Requirements
-
-- PHP 8.4+
-- Laravel 11+
-- Livewire Flux (^2.0)
-- Tailwind CSS
+| Light | Dark |
+|-------|------|
+| ![Light mode](resources/img/light.png) | ![Dark mode](resources/img/dark.png) |
 
 ## Installation
 
@@ -17,13 +12,9 @@ Beautiful donut charts for [Flux UI](https://fluxui.dev). Drop-in components wit
 composer require jonpurvis/flux-radial
 ```
 
-## Donut Component
+## Data Structure
 
-A radial chart with a number in the center, perfect for SaaS dashboards. Segments highlight on hover, showing values in both a tooltip and the center.
-
-### Data Structure
-
-Each segment requires `label`, `value`, and `class`:
+Both components use the same segment format. Each segment requires `label`, `value`, and `class`:
 
 ```php
 $data = [
@@ -35,17 +26,23 @@ $data = [
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `label` | `string` | Segment name (shown in tooltip and center on hover) |
+| `label` | `string` | Segment name (shown in tooltip and, for donut, in center on hover) |
 | `value` | `int\|float` | Segment value (determines arc size) |
 | `class` | `string` | Tailwind color class for the segment (e.g. `text-blue-500`) |
 
-### Basic Usage
+---
+
+## Donut Component
+
+A radial chart with a number in the center, perfect for dashboards. Segments highlight on hover, showing values in a tooltip and in the center.
+
+### Basic usage
 
 ```blade
 <flux:donut :data="$data" label="Total" />
 ```
 
-### Props
+### Donut – all options
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
@@ -53,14 +50,15 @@ $data = [
 | `label` | `string\|null` | `null` | Center label shown below the value |
 | `value` | `int\|float\|null` | `null` | Override center value (defaults to sum of data) |
 | `hover` | `string\|null` | `null` | Alternative label shown when hovering the center |
+| `hoverLabel` | `string\|null` | `null` | Alias for `hover` |
 | `legend` | `false\|'top'\|'bottom'\|'left'\|'right'` | `false` | Show legend at specified position |
 | `tooltip` | `bool` | `true` | Show tooltip on segment hover |
 | `cutout` | `int` | `70` | Inner hole size (0 = solid, 70 = donut, 90 = thin ring) |
 | `static` | `bool` | `false` | Disable hover/tap interactions |
 
-### With Legend
+### Donut examples
 
-Position the legend on any side:
+**Legend on any side**
 
 ```blade
 <flux:donut :data="$data" legend="bottom" />
@@ -69,63 +67,90 @@ Position the legend on any side:
 <flux:donut :data="$data" legend="right" />
 ```
 
-### Center Hover Label
-
-Show alternative text when hovering the center of the chart:
+**Center hover label**
 
 ```blade
 <flux:donut :data="$data" label="Total" hover="All Categories" />
 ```
 
-### Sizing
+**Thin ring** (`cutout` 90)
 
-Control size via the `class` attribute. The chart maintains a square aspect ratio:
+```blade
+<flux:donut :data="$data" :cutout="90" />
+```
+
+**Custom center value**
+
+```blade
+<flux:donut :data="$data" :value="85" label="Score" />
+```
+
+**Static (no interactions)**
+
+```blade
+<flux:donut :data="$data" :static="true" :tooltip="false" />
+```
+
+**Sizing** – use the `class` attribute; chart stays square:
 
 ```blade
 <flux:donut :data="$data" class="size-64" />
 <flux:donut :data="$data" class="max-w-xs mx-auto" />
 ```
 
-### Thin Ring
+---
 
-Set `cutout` to `90` for a thin progress ring style:
+## Pie Component
 
-```blade
-<flux:donut :data="$data" :cutout="90" />
-```
+A solid pie chart (no center hole). Same data structure as the donut; tooltips and legend work the same way.
 
-### Custom Center Value
-
-Override the center value (defaults to the sum of all segments):
+### Basic usage
 
 ```blade
-<flux:donut :data="$data" :value="85" label="Score" />
+<flux:pie :data="$data" />
 ```
 
-### Static Display
+### Pie – all options
 
-Disable hover interactions for a display-only chart:
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `data` | `array` | `[]` | Segments with `label`, `value`, and `class` (Tailwind color) |
+| `legend` | `false\|'top'\|'bottom'\|'left'\|'right'` | `false` | Show legend at specified position |
+| `tooltip` | `bool` | `true` | Show tooltip on segment hover |
+| `static` | `bool` | `false` | Disable hover/tap interactions |
+
+### Pie examples
+
+**With legend**
 
 ```blade
-<flux:donut :data="$data" :static="true" :tooltip="false" />
+<flux:pie :data="$data" legend="right" />
 ```
 
-### Building Data from Eloquent
+**Static**
 
-```php
-$data = Order::query()
-    ->selectRaw('status, count(*) as total')
-    ->groupBy('status')
-    ->get()
-    ->map(fn ($row) => [
-        'label' => $row->status,
-        'value' => $row->total,
-        'class' => match ($row->status) {
-            'pending' => 'text-yellow-500',
-            'completed' => 'text-green-500',
-            'cancelled' => 'text-red-500',
-            default => 'text-zinc-500',
-        },
-    ])
-    ->toArray();
+```blade
+<flux:pie :data="$data" :static="true" :tooltip="false" />
 ```
+
+**Sizing**
+
+```blade
+<flux:pie :data="$data" class="size-64" />
+```
+
+---
+
+## Styling
+
+- Segment colors use the `class` key in each data item (e.g. `text-green-500`).
+- Center text (donut) and tooltips use Flux-style zinc colors.
+- Full dark mode support.
+
+## Contributing
+
+Contributions are welcome. Please open an issue or pull request on [GitHub](https://github.com/jonpurvis/flux-radial).
+
+## License
+
+MIT

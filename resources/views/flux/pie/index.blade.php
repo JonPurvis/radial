@@ -1,62 +1,62 @@
 @props([
     'data' => [],
-    'label' => null,
-    'value' => null,
-    'hover' => null,
-    'hoverLabel' => null,
     'legend' => false,
     'tooltip' => true,
-    'cutout' => 70,
     'static' => false,
 ])
 
 @php
-    $radius = 80;
+    // Match donut's visible outer edge: donut stroke is centered on r=80, so outer edge = 80 + thickness/2.
+    // Default donut thickness (70% cutout) = 24, so outer edge at 92. Draw pie at 92 so sizes match.
+    $radius = 92;
     $total = array_sum(array_column($data, 'value'));
-    $displayValue = $value ?? $total;
+    
+    $viewBoxSize = 188;
+    $center = $viewBoxSize / 2;
 
-    // Clamp cutout between 0 and 95
-    $cutoutClamped = max(0, min(95, $cutout));
-    $thickness = (int) round($radius * (1 - $cutoutClamped / 100));
-    $hoverThickness = $thickness + 2; // Reduced from 4 for smaller overall size
-    $innerRadius = max(0, $radius - $thickness);
-
-    $circumference = 2 * M_PI * $radius;
-    $segmentCount = count(array_filter($data, fn ($item) => $item['value'] > 0));
-    $gap = $segmentCount > 1 ? 0.5 : 0;
-    $runningOffset = 0;
+    $runningAngle = 0;
 
     $segments = [];
     foreach ($data as $item) {
-        $length = $total > 0 ? ($item['value'] / $total) * $circumference : 0;
-        $visibleLength = max(0, $length - $gap);
+        $percentage = $total > 0 ? ($item['value'] / $total) : 0;
+        $angle = $percentage * 360;
+        
+        $startAngle = $runningAngle;
+        $endAngle = $runningAngle + $angle;
+        
+        $startRadians = deg2rad($startAngle - 90);
+        $endRadians = deg2rad($endAngle - 90);
+        
+        $cx = $center;
+        $cy = $center;
+        
+        $x1 = $cx + ($radius * cos($startRadians));
+        $y1 = $cy + ($radius * sin($startRadians));
+        $x2 = $cx + ($radius * cos($endRadians));
+        $y2 = $cy + ($radius * sin($endRadians));
+        
+        $largeArc = $angle > 180 ? 1 : 0;
+        
+        $path = "M {$cx} {$cy} L {$x1} {$y1} A {$radius} {$radius} 0 {$largeArc} 1 {$x2} {$y2} Z";
 
         $segments[] = [
             'label' => $item['label'],
             'value' => $item['value'],
             'class' => $item['class'] ?? '',
-            'dasharray' => $visibleLength.' '.($circumference - $visibleLength),
-            'dashoffset' => -($runningOffset + $gap / 2),
-            'percentage' => $total > 0 ? round(($item['value'] / $total) * 100, 1) : 0,
+            'path' => $path,
+            'percentage' => $total > 0 ? round($percentage * 100, 1) : 0,
         ];
 
-        $runningOffset += $length;
+        $runningAngle += $angle;
     }
-
-    // Same viewBox as pie (188) so both charts render at identical size in same container.
-    $viewBoxSize = 188;
-    $center = $viewBoxSize / 2;
 
     $legendPosition = is_string($legend) ? $legend : null;
     $showLegend = $legend !== false;
-    $showLabel = filled($label);
-    $hasHover = filled($hover);
-    $hasHoverLabel = filled($hoverLabel);
 
     $isHorizontalLegend = in_array($legendPosition, ['left', 'right']);
     $isVerticalLegend = in_array($legendPosition, ['top', 'bottom']);
 
-    // Chart size: max 13rem but responsive (scales down on small screens).
+    // Fixed chart size so donut and pie always match (size and spacing).
     $chartSize = '13rem';
 @endphp
 
@@ -72,35 +72,14 @@
     {{ $attributes->merge(['class' => $containerClass]) }}
     x-data="{
         hovered: null,
-        centerHovered: false,
         showTooltip: false,
         tooltipX: 0,
         tooltipY: 0,
         isStatic: @js($static),
-        displayValue: @js($displayValue),
-        label: @js($label ?? ''),
-        hover: @js($hover ?? ''),
-        hoverLabel: @js($hoverLabel ?? ''),
-        hasHover: @js($hasHover),
-        hasHoverLabel: @js($hasHoverLabel),
         segments: @js($segments),
 
-        get currentValue() {
-            if (this.centerHovered && this.hasHover) {
-                return this.hover;
-            }
-            return this.hovered !== null ? this.segments[this.hovered].value : this.displayValue;
-        },
-
-        get currentLabel() {
-            if (this.centerHovered && this.hasHoverLabel) {
-                return this.hoverLabel;
-            }
-            return this.hovered !== null ? this.segments[this.hovered].label : this.label;
-        },
-
         handleHover(event, index) {
-            console.log('handleHover called', { isStatic: this.isStatic, index });
+            console.log('pie handleHover called', { isStatic: this.isStatic, index });
             if (this.isStatic) return;
 
             this.hovered = index;
@@ -130,21 +109,6 @@
 
             this.hovered = null;
             this.showTooltip = false;
-            this.centerHovered = false;
-        },
-
-        handleCenterEnter() {
-            if (! this.isStatic) {
-                this.handleLeave();
-            }
-            
-            if (this.hasHover) {
-                this.centerHovered = true;
-            }
-        },
-
-        handleCenterLeave() {
-            this.centerHovered = false;
         },
 
         handleTap(event, index) {
@@ -195,65 +159,17 @@
             @touchstart.self="handleOutsideTap()"
         >
             @foreach ($segments as $i => $segment)
-                <circle
-                    cx="{{ $center }}"
-                    cy="{{ $center }}"
-                    r="{{ $radius }}"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="{{ $thickness }}"
-                    stroke-dasharray="{{ $segment['dasharray'] }}"
-                    stroke-dashoffset="{{ $segment['dashoffset'] }}"
-                    stroke-linecap="butt"
-                    transform="rotate(-90 {{ $center }} {{ $center }})"
+                <path
+                    d="{{ $segment['path'] }}"
+                    fill="currentColor"
                     class="{{ $segment['class'] }} transition-all duration-150"
                     x-bind:style="{ opacity: hovered === {{ $i }} ? 1 : (hovered !== null ? 0.3 : 1) }"
-                    :stroke-width="hovered === {{ $i }} ? {{ $hoverThickness }} : {{ $thickness }}"
                     @mouseenter="handleHover($event, {{ $i }})"
                     @mousemove="handleHover($event, {{ $i }})"
                     @mouseleave="handleLeave()"
                     @touchstart.prevent="handleTap($event, {{ $i }})"
                 />
             @endforeach
-
-            @if ($innerRadius > 0 && (! $static || $hasHover))
-                <circle
-                    cx="{{ $center }}"
-                    cy="{{ $center }}"
-                    r="{{ $innerRadius }}"
-                    fill="transparent"
-                    @mouseenter="handleCenterEnter()"
-                    @mouseleave="handleCenterLeave()"
-                />
-            @endif
-
-            <g class="text-zinc-900 dark:text-white" style="fill: currentColor;">
-                <text
-                    x="{{ $center }}"
-                    y="{{ $showLabel ? $center - 6 : $center }}"
-                    text-anchor="middle"
-                    dominant-baseline="{{ $showLabel ? 'auto' : 'middle' }}"
-                    class="pointer-events-none font-semibold"
-                    style="font-size: 18px;"
-                >
-                    <tspan x="{{ $center }}" x-text="currentValue.toLocaleString()">{{ number_format($displayValue) }}</tspan>
-                </text>
-            </g>
-
-            @if ($showLabel)
-                <g class="text-zinc-500 dark:text-zinc-300" style="fill: currentColor;">
-                    <text
-                        x="{{ $center }}"
-                        y="{{ $center + 14 }}"
-                        text-anchor="middle"
-                        dominant-baseline="auto"
-                        class="pointer-events-none"
-                        style="font-size: 10px;"
-                    >
-                        <tspan x="{{ $center }}" x-text="currentLabel">{{ $label }}</tspan>
-                    </text>
-                </g>
-            @endif
 
             {{ $slot }}
         </svg>
