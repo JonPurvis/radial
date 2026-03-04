@@ -1,6 +1,6 @@
 # Radial
 
-Beautiful donut and pie charts for [Flux UI](https://fluxui.dev). Drop-in components with hover effects, legends, and dark mode support.
+Radial is a companion for [Flux UI](https://fluxui.dev), adding donut and pie charts styled to match Flux’s look and feel. Simple to use, with hover effects, legends, and dark mode support.
 
 | Light | Dark |
 |-------|------|

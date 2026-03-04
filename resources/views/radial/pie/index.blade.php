@@ -79,7 +79,6 @@
         segments: @js($segments),
 
         handleHover(event, index) {
-            console.log('pie handleHover called', { isStatic: this.isStatic, index });
             if (this.isStatic) return;
 
             this.hovered = index;

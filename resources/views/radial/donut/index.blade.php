@@ -100,7 +100,6 @@
         },
 
         handleHover(event, index) {
-            console.log('handleHover called', { isStatic: this.isStatic, index });
             if (this.isStatic) return;
 
             this.hovered = index;
