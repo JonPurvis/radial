@@ -3,6 +3,7 @@
     'legend' => false,
     'tooltip' => true,
     'static' => false,
+    'size' => '13rem',
 ])
 
 @php
@@ -56,15 +57,14 @@
     $isHorizontalLegend = in_array($legendPosition, ['left', 'right']);
     $isVerticalLegend = in_array($legendPosition, ['top', 'bottom']);
 
-    // Fixed chart size so donut and pie always match (size and spacing).
-    $chartSize = '13rem';
+    $chartSize = $size;
 @endphp
 
 @php
     $containerClass = match (true) {
-        $isHorizontalLegend => 'relative flex flex-row items-center justify-center gap-4 min-w-0 w-full',
-        $isVerticalLegend => 'relative flex flex-col items-center min-w-0 min-h-0 w-full',
-        default => 'relative min-w-0 w-full',
+        $isHorizontalLegend => 'relative flex flex-row items-center justify-center gap-4 min-w-0 w-fit max-w-full mx-auto',
+        $isVerticalLegend => 'relative flex flex-col items-center min-w-0 min-h-0 w-fit max-w-full mx-auto',
+        default => 'relative min-w-0 w-fit max-w-full mx-auto',
     };
 @endphp
 
@@ -144,7 +144,7 @@
     @endif
 
     <div
-        class="flex justify-center items-center aspect-square max-w-52 max-h-52 {{ $isVerticalLegend ? 'min-h-0 min-w-0 flex-shrink' : 'shrink-0' }}"
+        class="flex justify-center items-center aspect-square {{ $isVerticalLegend ? 'min-h-0 min-w-0 flex-shrink' : 'shrink-0' }}"
         @if ($showLegend)
             style="width: {{ $chartSize }}; {{ $isHorizontalLegend ? 'max-width: min(100%, calc(100% - 7rem));' : 'max-width: 100%; max-height: min(100%, calc(100% - 7rem));' }}"
         @else
