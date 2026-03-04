@@ -1,11 +1,11 @@
 <?php
 
-namespace FluxRadial;
+namespace Radial;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
-class FluxRadialServiceProvider extends ServiceProvider
+class RadialServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
@@ -15,8 +15,8 @@ class FluxRadialServiceProvider extends ServiceProvider
     protected function registerBladeComponents(): void
     {
         Blade::anonymousComponentPath(
-            __DIR__.'/../resources/views/flux',
-            'flux'
+            __DIR__.'/../resources/views/radial',
+            'radial'
         );
     }
 }

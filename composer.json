@@ -1,9 +1,7 @@
 {
-    "name": "jonpurvis/flux-radial",
-    "description": "Beautiful donut charts for Flux UI. Drop-in components with hover effects, legends, and dark mode support.",
+    "name": "jonpurvis/radial",
+    "description": "Beautiful donut and pie charts for Flux UI. Drop-in components with hover effects, legends, and dark mode support.",
     "keywords": [
-        "flux",
-        "flux-ui",
         "livewire",
         "donut",
         "chart",
@@ -23,13 +21,13 @@
     },
     "autoload": {
         "psr-4": {
-            "FluxRadial\\": "src/"
+            "Radial\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "FluxRadial\\FluxRadialServiceProvider"
+                "Radial\\RadialServiceProvider"
             ]
         }
     },

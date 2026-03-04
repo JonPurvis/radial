@@ -9,7 +9,7 @@ Beautiful donut and pie charts for [Flux UI](https://fluxui.dev). Drop-in compon
 ## Installation
 
 ```bash
-composer require jonpurvis/flux-radial
+composer require jonpurvis/radial
 ```
 
 ## Data Structure
@@ -39,7 +39,7 @@ A radial chart with a number in the center, perfect for dashboards. Segments hig
 ### Basic usage
 
 ```blade
-<flux:donut :data="$data" label="Total" />
+<radial:donut :data="$data" label="Total" />
 ```
 
 ### Donut – all options
@@ -62,41 +62,41 @@ A radial chart with a number in the center, perfect for dashboards. Segments hig
 **Legend on any side**
 
 ```blade
-<flux:donut :data="$data" legend="bottom" />
-<flux:donut :data="$data" legend="top" />
-<flux:donut :data="$data" legend="left" />
-<flux:donut :data="$data" legend="right" />
+<radial:donut :data="$data" legend="bottom" />
+<radial:donut :data="$data" legend="top" />
+<radial:donut :data="$data" legend="left" />
+<radial:donut :data="$data" legend="right" />
 ```
 
 **Center hover label**
 
 ```blade
-<flux:donut :data="$data" label="Total" hover="All Categories" />
+<radial:donut :data="$data" label="Total" hover="All Categories" />
 ```
 
 **Thin ring** (`cutout` 90)
 
 ```blade
-<flux:donut :data="$data" :cutout="90" />
+<radial:donut :data="$data" :cutout="90" />
 ```
 
 **Custom center value**
 
 ```blade
-<flux:donut :data="$data" :value="85" label="Score" />
+<radial:donut :data="$data" :value="85" label="Score" />
 ```
 
 **Static (no interactions)**
 
 ```blade
-<flux:donut :data="$data" :static="true" :tooltip="false" />
+<radial:donut :data="$data" :static="true" :tooltip="false" />
 ```
 
 **Sizing** – use the `class` attribute; chart stays square:
 
 ```blade
-<flux:donut :data="$data" class="size-64" />
-<flux:donut :data="$data" class="max-w-xs mx-auto" />
+<radial:donut :data="$data" class="size-64" />
+<radial:donut :data="$data" class="max-w-xs mx-auto" />
 ```
 
 ---
@@ -108,7 +108,7 @@ A solid pie chart (no center hole). Same data structure as the donut; tooltips a
 ### Basic usage
 
 ```blade
-<flux:pie :data="$data" />
+<radial:pie :data="$data" />
 ```
 
 ### Pie – all options
@@ -126,19 +126,19 @@ A solid pie chart (no center hole). Same data structure as the donut; tooltips a
 **With legend**
 
 ```blade
-<flux:pie :data="$data" legend="right" />
+<radial:pie :data="$data" legend="right" />
 ```
 
 **Static**
 
 ```blade
-<flux:pie :data="$data" :static="true" :tooltip="false" />
+<radial:pie :data="$data" :static="true" :tooltip="false" />
 ```
 
 **Sizing**
 
 ```blade
-<flux:pie :data="$data" class="size-64" />
+<radial:pie :data="$data" class="size-64" />
 ```
 
 ---
@@ -166,7 +166,7 @@ Drop these into a Flux/Livewire page to try the components.
 ];
 @endphp
 
-<flux:donut :data="$donutData" label="Total" />
+<radial:donut :data="$donutData" label="Total" />
 ```
 
 ### Donut – with legend and center hover
@@ -180,7 +180,7 @@ Drop these into a Flux/Livewire page to try the components.
 ];
 @endphp
 
-<flux:donut :data="$donutData" label="Total" hover="All items" legend="bottom" />
+<radial:donut :data="$donutData" label="Total" hover="All items" legend="bottom" />
 ```
 
 ### Pie – minimal
@@ -194,7 +194,7 @@ Drop these into a Flux/Livewire page to try the components.
 ];
 @endphp
 
-<flux:pie :data="$pieData" />
+<radial:pie :data="$pieData" />
 ```
 
 ### Pie – with legend
@@ -208,7 +208,7 @@ Drop these into a Flux/Livewire page to try the components.
 ];
 @endphp
 
-<flux:pie :data="$pieData" legend="right" />
+<radial:pie :data="$pieData" legend="right" />
 ```
 
 ### Side-by-side donut and pie
@@ -223,14 +223,14 @@ Drop these into a Flux/Livewire page to try the components.
 @endphp
 
 <div class="flex flex-wrap gap-8 justify-center items-start">
-    <flux:donut :data="$chartData" label="Total" legend="bottom" />
-    <flux:pie :data="$chartData" legend="right" />
+    <radial:donut :data="$chartData" label="Total" legend="bottom" />
+    <radial:pie :data="$chartData" legend="right" />
 </div>
 ```
 
 ## Contributing
 
-Contributions are welcome. Please open an issue or pull request on [GitHub](https://github.com/jonpurvis/flux-radial).
+Contributions are welcome. Please open an issue or pull request on [GitHub](https://github.com/jonpurvis/radial).
 
 ## License
 
