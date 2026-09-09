@@ -1,5 +1,8 @@
 # Radial
 
+> [!IMPORTANT]
+> This package is now abandoned. It existed to provide Flux-style pie and donut charts before Flux UI offered them. Flux added those charts in [v2.19.0](https://github.com/livewire/flux/releases/tag/v2.19.0). If you still use this package, switch to the Flux components instead.
+
 Radial is a companion for [Flux UI](https://fluxui.dev), adding donut and pie charts styled to match Flux’s look and feel. Simple to use, with hover effects, legends, and dark mode support.
 
 | Light | Dark |
